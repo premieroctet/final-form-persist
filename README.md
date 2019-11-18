@@ -54,10 +54,10 @@ Creates a final form decorator.
 
 ```ts
 createPersistDecorator = ({
-  name: string;
-  debounceTime?: number;
-  whitelist: string[];
-  storage?: Storage;
+  name: string
+  debounceTime?: number
+  whitelist: string[]
+  storage?: Storage
 }) => FinalFormPersistDecorator
 ```
 
@@ -67,6 +67,7 @@ createPersistDecorator = ({
 {
   persistDecorator: Decorator
   clear: () => void
+  isPersisted: boolean
 }
 ```
 
