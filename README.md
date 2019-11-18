@@ -1,6 +1,6 @@
 # final-form-persist
 
-> Persist your form values into a storage
+> Persist your final-form values into a storage
 
 [![NPM](https://img.shields.io/npm/v/final-form-persist.svg)](https://www.npmjs.com/package/final-form-persist) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
@@ -24,12 +24,22 @@ import { createPersistDecorator } from 'final-form-persist'
 
 const form = createForm({ onSubmit })
 
-const persistDecorator = createPersistDecorator({
+const { persistDecorator, clear } = createPersistDecorator({
   name: 'myPersistKey'
   debounceTime: 500 // in ms
   whitelist: ['some', 'key']
   storage: localStorage // this is the default
 })
+
+const undecorate = persistDecorator(form)
+
+// Use form
+
+// Remove the entry from the storage if you want
+clear()
+
+// Clean up
+undecorate()
 ```
 
 ## API
@@ -44,7 +54,16 @@ createPersistDecorator = ({
   debounceTime?: number;
   whitelist: string[];
   storage?: Storage;
-}) => Decorator<object>
+}) => FinalFormPersistDecorator
+```
+
+### type `FinalFormPersistDecorator`
+
+```ts
+{
+  persistDecorator: Decorator
+  clear: () => void
+}
 ```
 
 ## License
