@@ -1,23 +1,39 @@
-/**
- * @class ExampleComponent
- */
+import { Decorator, FormApi } from "final-form"
+import debounce from "lodash.debounce"
 
-import * as React from 'react'
-
-import styles from './styles.css'
-
-export type Props = { text: string }
-
-export default class ExampleComponent extends React.Component<Props> {
-  render() {
-    const {
-      text
-    } = this.props
-
-    return (
-      <div className={styles.test}>
-        Example Component: {text}
-      </div>
-    )
-  }
+interface FinalFormPersistOptions {
+  name: string
+  debounceTime?: number
+  whitelist?: string[]
+  storage?: Storage
 }
+
+const createPersistDecorator = (options: FinalFormPersistOptions): Decorator => (form: FormApi) => {
+  const { name, debounceTime = 0, whitelist = [], storage = localStorage } = options
+  const persistedValues = storage.getItem(name) || "{}"
+  const { initialValues } = form.getState()
+
+  form.initialize({ initialValues, ...JSON.parse(persistedValues) })
+
+  const unsubscribe = form.subscribe(
+    debounce(({ values }) => {
+      let valuesKeys = Object.keys(values)
+      if (whitelist.length > 0) {
+        valuesKeys = Object.keys(values).filter(value => whitelist.includes(value))
+      }
+      const valuesObject = valuesKeys.reduce((acc, key) => {
+        return {
+          ...acc,
+          [key]: values[key],
+        }
+      }, {})
+
+      storage.setItem(name, JSON.stringify(valuesObject))
+    }, debounceTime),
+    { values: true },
+  )
+
+  return unsubscribe
+}
+
+export { createPersistDecorator }
