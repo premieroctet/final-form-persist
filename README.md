@@ -42,6 +42,10 @@ clear()
 undecorate()
 ```
 
+## Example
+
+[Example](https://codesandbox.io/s/final-form-persist-example-s4wz5) build with [react-final-form](https://github.com/final-form/react-final-form)
+
 ## API
 
 ### `createPersistDecorator`
