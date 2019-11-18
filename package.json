@@ -1,6 +1,6 @@
 {
   "name": "final-form-persist",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Persist your form values into a storage",
   "author": "premieroctet",
   "license": "MIT",
