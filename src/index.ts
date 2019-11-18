@@ -11,7 +11,7 @@ export interface FinalFormPersistOptions {
 export interface FinalFormPersistDecorator {
   persistDecorator: Decorator
   clear: () => void
-  isPersisted: boolean
+  isPersisted: () => boolean
 }
 
 const persistDecorator = (options: FinalFormPersistOptions) => (form: FormApi) => {
@@ -55,9 +55,11 @@ export const createPersistDecorator = (options: FinalFormPersistOptions): FinalF
     storage.removeItem(name)
   }
 
+  const isPersisted = () => !!storage.getItem(name)
+
   return {
     persistDecorator: persistDecorator(options),
     clear,
-    isPersisted: !!storage.getItem(name),
+    isPersisted
   }
 }
