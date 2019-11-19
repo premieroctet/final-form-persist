@@ -1,0 +1,22 @@
+{
+  "name": "toto-example",
+  "homepage": "https://final-form-persist.netlify.com",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "final-form": "^4.18.6",
+    "final-form-persist": "link:..",
+    "prop-types": "^15.6.2",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-final-form": "^6.3.2",
+    "react-scripts": "^1.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}

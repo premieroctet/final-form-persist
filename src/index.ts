@@ -38,7 +38,7 @@ const persistDecorator = (options: FinalFormPersistOptions) => (form: FormApi) =
       if (!pristine) {
         storage.setItem(name, JSON.stringify(valuesObject))
       }
-    }, debounceTime),
+    }, debounceTime, { leading: true, trailing: true }),
     { values: true, pristine: true },
   )
 
