@@ -8,14 +8,21 @@ export interface FinalFormPersistOptions {
   storage?: Storage
 }
 
-export interface FinalFormPersistDecorator {
-  persistDecorator: Decorator
+export interface FinalFormPersistDecorator<FormValues = object> {
+  persistDecorator: Decorator<FormValues>
   clear: () => void
   isPersisted: () => boolean
 }
 
-const persistDecorator = (options: FinalFormPersistOptions) => (form: FormApi) => {
-  const { name, debounceTime = 0, whitelist = [], storage = localStorage } = options
+const persistDecorator = <FormValues = object>(
+  options: FinalFormPersistOptions
+) => (form: FormApi<FormValues>) => {
+  const {
+    name,
+    debounceTime = 0,
+    whitelist = [],
+    storage = localStorage,
+  } = options
 
   const persistedValues = storage.getItem(name) || "{}"
   const { initialValues } = form.getState()
@@ -23,29 +30,37 @@ const persistDecorator = (options: FinalFormPersistOptions) => (form: FormApi) =
   form.initialize({ ...initialValues, ...JSON.parse(persistedValues) })
 
   const unsubscribe = form.subscribe(
-    debounce(({ values, pristine }) => {
-      let valuesKeys = Object.keys(values)
-      if (whitelist.length > 0) {
-        valuesKeys = Object.keys(values).filter(value => whitelist.includes(value))
-      }
-      const valuesObject = valuesKeys.reduce((acc, key) => {
-        return {
-          ...acc,
-          [key]: values[key],
+    debounce(
+      ({ values, pristine }) => {
+        let valuesKeys = Object.keys(values)
+        if (whitelist.length > 0) {
+          valuesKeys = Object.keys(values).filter((value) =>
+            whitelist.includes(value)
+          )
         }
-      }, {})
+        const valuesObject = valuesKeys.reduce((acc, key) => {
+          return {
+            ...acc,
+            [key]: values[key],
+          }
+        }, {})
 
-      if (!pristine) {
-        storage.setItem(name, JSON.stringify(valuesObject))
-      }
-    }, debounceTime, { leading: true, trailing: true }),
-    { values: true, pristine: true },
+        if (!pristine) {
+          storage.setItem(name, JSON.stringify(valuesObject))
+        }
+      },
+      debounceTime,
+      { leading: true, trailing: true }
+    ),
+    { values: true, pristine: true }
   )
 
   return unsubscribe
 }
 
-export const createPersistDecorator = (options: FinalFormPersistOptions): FinalFormPersistDecorator => {
+export const createPersistDecorator = <FormValues = object>(
+  options: FinalFormPersistOptions
+): FinalFormPersistDecorator<FormValues> => {
   const { name, storage = localStorage } = options
   if (!name) {
     throw new Error('createPersistDecorator expects a "name" option')
@@ -58,8 +73,8 @@ export const createPersistDecorator = (options: FinalFormPersistOptions): FinalF
   const isPersisted = () => !!storage.getItem(name)
 
   return {
-    persistDecorator: persistDecorator(options),
+    persistDecorator: persistDecorator<FormValues>(options),
     clear,
-    isPersisted
+    isPersisted,
   }
 }
