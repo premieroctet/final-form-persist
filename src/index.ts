@@ -1,10 +1,11 @@
 import { Decorator, FormApi } from "final-form"
 import debounce from "lodash.debounce"
 
-export interface FinalFormPersistOptions {
+export interface FinalFormPersistOptions<FormValues = object> {
   name: string
   debounceTime?: number
-  whitelist?: string[]
+  whitelist?: Array<keyof FormValues>
+  blacklist?: Array<keyof FormValues>
   storage?: Storage
 }
 
@@ -15,13 +16,14 @@ export interface FinalFormPersistDecorator<FormValues = object> {
 }
 
 const persistDecorator = <FormValues = object>(
-  options: FinalFormPersistOptions
+  options: FinalFormPersistOptions<FormValues>
 ) => (form: FormApi<FormValues>) => {
   const {
     name,
     debounceTime = 0,
     whitelist = [],
     storage = localStorage,
+    blacklist = [],
   } = options
 
   const persistedValues = storage.getItem(name) || "{}"
@@ -32,10 +34,15 @@ const persistDecorator = <FormValues = object>(
   const unsubscribe = form.subscribe(
     debounce(
       ({ values, pristine }) => {
-        let valuesKeys = Object.keys(values)
-        if (whitelist.length > 0) {
-          valuesKeys = Object.keys(values).filter((value) =>
-            whitelist.includes(value)
+        let valuesKeys = Object.keys(values) as Array<keyof FormValues>
+        if (whitelist.length > 0 && !blacklist.length) {
+          valuesKeys = (Object.keys(values) as Array<
+            keyof FormValues
+          >).filter((value) => whitelist.includes(value))
+        }
+        if (blacklist.length > 0) {
+          valuesKeys = (Object.keys(values) as Array<keyof FormValues>).filter(
+            (value) => !blacklist.includes(value)
           )
         }
         const valuesObject = valuesKeys.reduce((acc, key) => {
@@ -59,7 +66,7 @@ const persistDecorator = <FormValues = object>(
 }
 
 export const createPersistDecorator = <FormValues = object>(
-  options: FinalFormPersistOptions
+  options: FinalFormPersistOptions<FormValues>
 ): FinalFormPersistDecorator<FormValues> => {
   const { name, storage = localStorage } = options
   if (!name) {
