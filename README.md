@@ -25,9 +25,9 @@ import { createPersistDecorator } from 'final-form-persist'
 const form = createForm({ onSubmit })
 
 const { persistDecorator, clear } = createPersistDecorator({
-  name: 'myPersistKey'
-  debounceTime: 500 // in ms
-  whitelist: ['some', 'key']
+  name: 'myPersistKey',
+  debounceTime: 500, // in ms
+  whitelist: ['some', 'key'],
   storage: localStorage // this is the default
 })
 
